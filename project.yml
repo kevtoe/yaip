@@ -1,0 +1,127 @@
+name: Yaip
+
+options:
+  createIntermediateGroups: true
+  deploymentTarget:
+    # macOS 14 is FluidAudio's floor. WhisperKit itself would run on 13.
+    macOS: "14.0"
+
+configs:
+  Debug: debug
+  Release: release
+
+packages:
+  ArgmaxOSS:
+    url: https://github.com/argmaxinc/argmax-oss-swift
+    from: "1.1.0"
+  FluidAudio:
+    url: https://github.com/FluidInference/FluidAudio
+    from: "0.15.5"
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_STRICT_CONCURRENCY: complete
+    MACOSX_DEPLOYMENT_TARGET: "14.0"
+    # WhisperKit and FluidAudio use Apple Silicon frameworks and do not vend
+    # x86_64 slices, so Yaip is distributed for Apple Silicon only.
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: NO
+    CODE_SIGN_STYLE: Automatic
+    ENABLE_USER_SCRIPT_SANDBOXING: YES
+    GENERATE_INFOPLIST_FILE: YES
+    ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS: YES
+  configs:
+    # Debug is signed ad-hoc here and then RE-SIGNED by `Scripts/build.sh` with
+    # a stable local identity. This is not cosmetic: TCC keys Accessibility and
+    # Input Monitoring to the code signature, and an ad-hoc signature's identity
+    # is its CDHash, which changes on every single build. Ad-hoc alone therefore
+    # means re-granting both permissions after every rebuild, and a Privacy list
+    # that fills with duplicate "Yaip" entries.
+    #
+    # Re-signing as a post-build step keeps developer identity out of this file
+    # and sidesteps Xcode mapping "Apple Development" onto a "Mac Development"
+    # certificate that does not exist on this machine.
+    Debug:
+      CODE_SIGN_IDENTITY: "-"
+
+    # Release stays ad-hoc until the public release script supplies a team.
+    # A locally shared candidate should not carry the builder's identity.
+    # Stripping removes the debug map; the prefix maps neutralise any path
+    # surviving in debug data or `#file`.
+    Release:
+      CODE_SIGN_IDENTITY: "-"
+      DEPLOYMENT_POSTPROCESSING: YES
+      STRIP_INSTALLED_PRODUCT: YES
+      # `debugging` rather than `all`: a SwiftUI binary leans on runtime type
+      # metadata, and full stripping is a known source of obscure breakage.
+      # The path-leak concern that motivated stripping is already covered by
+      # `-file-prefix-map` and dwarf-only debug info below.
+      STRIP_STYLE: debugging
+      COPY_PHASE_STRIP: YES
+      DEBUG_INFORMATION_FORMAT: dwarf
+      OTHER_SWIFT_FLAGS: "-file-prefix-map $(SRCROOT)=/Yaip"
+      OTHER_CFLAGS: "-fdebug-prefix-map=$(SRCROOT)=/Yaip"
+
+targets:
+  Yaip:
+    type: application
+    platform: macOS
+    sources:
+      - path: Sources
+      - path: Resources
+        buildPhase: resources
+    dependencies:
+      - package: ArgmaxOSS
+        product: WhisperKit
+      - package: FluidAudio
+        product: FluidAudio
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.yaip.v1
+        PRODUCT_NAME: Yaip
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        INFOPLIST_KEY_CFBundleDisplayName: Yaip
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.productivity
+        INFOPLIST_KEY_NSHighResolutionCapable: YES
+        INFOPLIST_KEY_NSMicrophoneUsageDescription: "Yaip records your microphone so it can transcribe what you say."
+        INFOPLIST_KEY_UIAppFonts: "Urbanist[wght].ttf"
+        # Unsandboxed: dictation needs an Accessibility-trusted event tap, which
+        # the App Sandbox does not permit.
+        ENABLE_HARDENED_RUNTIME: YES
+        ENABLE_APP_SANDBOX: NO
+        CODE_SIGN_ENTITLEMENTS: Config/Yaip.entitlements
+        SUPPORTED_PLATFORMS: macosx
+        SUPPORTS_MACCATALYST: NO
+        LSArchitecturePriority: arm64
+        INFOPLIST_KEY_LSRequiresNativeExecution: YES
+
+  YaipTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: Yaip
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.yaip.v1.tests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/Yaip.app/Contents/MacOS/Yaip"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+schemes:
+  Yaip:
+    build:
+      targets:
+        Yaip: all
+        YaipTests: [test]
+    test:
+      targets:
+        - YaipTests
+    run:
+      config: Debug
+    archive:
+      config: Release

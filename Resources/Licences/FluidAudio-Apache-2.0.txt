@@ -1,0 +1,6 @@
+FluidAudio
+
+Licensed under the Apache License, Version 2.0.
+The full Apache 2.0 licence is included in Apache-2.0.txt.
+
+Source: https://github.com/FluidInference/FluidAudio

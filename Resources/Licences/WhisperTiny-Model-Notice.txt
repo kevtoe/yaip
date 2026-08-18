@@ -1,0 +1,15 @@
+Bundled model: OpenAI Whisper Tiny, multilingual
+
+Original model:
+  https://huggingface.co/openai/whisper-tiny
+  Revision: 169d4a4341b33bc18d8881c4b69c2e104e1cc0af
+  Model card licence: Apache-2.0
+
+Core ML conversion:
+  https://huggingface.co/argmaxinc/whisperkit-coreml
+  Revision: 97a5bf9bbc74c7d9c12c755d04dea59e672e3808
+  Runtime/conversion project: WhisperKit, MIT
+
+The original OpenAI Whisper source-code licence and the model-card licence are
+included with this application. The bundled files are used only for local,
+on-device speech transcription and are never uploaded by Yaip.
