@@ -21,16 +21,12 @@ final class DictationPreferencesTests: XCTestCase {
         super.tearDown()
     }
 
-    @MainActor func testDefaultsAreTheZeroDownloadPath() {
+    @MainActor func testDefaultsUseTheSafePlatformDefault() {
         let preferences = DictationPreferences(defaults: defaults)
 
         XCTAssertEqual(preferences.shortcut, .modifier(.fn))
         XCTAssertEqual(preferences.activationMode, .pushToTalk)
-        guard case .appleSpeech = preferences.engine else {
-            return XCTFail(
-                "A fresh install must default to Apple Speech so it works with no download."
-            )
-        }
+        XCTAssertEqual(preferences.engine, ModelDescriptor.defaultDictationSelection)
     }
 
     @MainActor func testModifierShortcutSurvivesRelaunch() {
@@ -88,8 +84,6 @@ final class DictationPreferencesTests: XCTestCase {
 
         let preferences = DictationPreferences(defaults: defaults)
         XCTAssertEqual(preferences.shortcut, .default)
-        guard case .appleSpeech = preferences.engine else {
-            return XCTFail("A corrupt stored engine must fall back to the safe default.")
-        }
+        XCTAssertEqual(preferences.engine, ModelDescriptor.defaultDictationSelection)
     }
 }
