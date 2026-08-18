@@ -43,10 +43,10 @@ actor WhisperKitRunner: TranscriptionRunner {
 
         do {
             if let registered {
-                pipe = try await Self.loadRegistered(registered)
+                pipe = try await loadRegistered(registered)
             } else if let modelURL = ModelStorage.bundledWhisperModel(model),
                       let tokenizerURL = ModelStorage.bundledWhisperTokenizer(model) {
-                pipe = try await Self.loadLocal(
+                pipe = try await loadLocal(
                     modelURL: modelURL,
                     tokenizerURL: tokenizerURL
                 )
@@ -57,7 +57,7 @@ actor WhisperKitRunner: TranscriptionRunner {
                     engine: .whisperKit,
                     tokenizerFolder: tokenizerURL
                 )
-                pipe = try await Self.loadLocal(
+                pipe = try await loadLocal(
                     modelURL: modelURL,
                     tokenizerURL: tokenizerURL
                 )
@@ -111,7 +111,7 @@ actor WhisperKitRunner: TranscriptionRunner {
 
     // MARK: Private
 
-    private static func loadRegistered(
+    private func loadRegistered(
         _ registered: ResolvedRegisteredModel
     ) async throws -> WhisperKit {
         let modelURL = registered.modelFolder.url
@@ -119,7 +119,7 @@ actor WhisperKitRunner: TranscriptionRunner {
         return try await loadLocal(modelURL: modelURL, tokenizerURL: tokenizerURL)
     }
 
-    private static func loadLocal(
+    private func loadLocal(
         modelURL: URL,
         tokenizerURL: URL
     ) async throws -> WhisperKit {
@@ -136,7 +136,7 @@ actor WhisperKitRunner: TranscriptionRunner {
             WhisperKitConfig(
                 modelFolder: modelURL.path,
                 tokenizerFolder: tokenizerURL,
-                computeOptions: computeOptions,
+                computeOptions: Self.computeOptions,
                 load: false,
                 download: false
             )

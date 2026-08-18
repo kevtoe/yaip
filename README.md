@@ -10,7 +10,12 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/kevtoe/yaip/releases/latest"><img alt="Download Yaip" src="https://img.shields.io/github/v/release/kevtoe/yaip?label=download&color=5fae6e"></a>
+  <a href="https://github.com/kevtoe/yaip/releases/download/v0.1.0/Yaip-0.1.0-apple-silicon.dmg"><strong>Download Yaip 0.1.0 DMG</strong></a>
+  · macOS 14+ · Apple Silicon
+</p>
+
+<p align="center">
+  <a href="https://github.com/kevtoe/yaip/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/kevtoe/yaip?label=release&color=5fae6e"></a>
   <a href="https://github.com/kevtoe/yaip/actions/workflows/test.yml"><img alt="Test status" src="https://github.com/kevtoe/yaip/actions/workflows/test.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="MIT licence" src="https://img.shields.io/badge/licence-MIT-blue.svg"></a>
   <img alt="Local audio" src="https://img.shields.io/badge/audio-stays_local-315c42">
@@ -50,8 +55,7 @@ download a local model.
 
 Yaip requires macOS 14 or later on an Apple Silicon Mac.
 
-1. Download the latest Apple Silicon DMG from
-   [Releases](https://github.com/kevtoe/yaip/releases/latest).
+1. [Download Yaip 0.1.0 for Apple Silicon](https://github.com/kevtoe/yaip/releases/download/v0.1.0/Yaip-0.1.0-apple-silicon.dmg).
 2. Drag Yaip to Applications.
 3. Open Yaip from Applications and complete its permission checklist.
 4. Return to Yaip, click **Check Again**, then **Finish Setup**.
