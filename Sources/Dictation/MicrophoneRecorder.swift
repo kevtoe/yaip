@@ -22,12 +22,14 @@ final class MicrophoneRecorder: @unchecked Sendable {
     /// Most recent RMS level, 0...1, for the overlay waveform.
     var level: Float { lock.withLock { currentLevel } }
 
-    private static let targetFormat = AVAudioFormat(
-        commonFormat: .pcmFormatFloat32,
-        sampleRate: AudioBuffer.sampleRate,
-        channels: 1,
-        interleaved: false
-    )
+    private static var targetFormat: AVAudioFormat? {
+        AVAudioFormat(
+            commonFormat: .pcmFormatFloat32,
+            sampleRate: AudioBuffer.sampleRate,
+            channels: 1,
+            interleaved: false
+        )
+    }
 
     // MARK: Permission
 
