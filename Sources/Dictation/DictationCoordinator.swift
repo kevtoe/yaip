@@ -56,9 +56,9 @@ final class DictationCoordinator {
                 try? await Task.sleep(for: .seconds(2))
                 guard let self else { return }
                 guard FirstRunState.shouldPresentSetup == false else { continue }
-                guard dictation.isEnabled == false else { continue }
+                guard self.dictation.isEnabled == false else { continue }
                 if InputPermissions.hasAccessibility {
-                    dictation.enable()
+                    self.dictation.enable()
                 }
             }
         }
@@ -73,8 +73,8 @@ final class DictationCoordinator {
         } onChange: { [weak self] in
             Task { @MainActor [weak self] in
                 guard let self else { return }
-                overlay.setVisible(dictation.phase.isActive)
-                observePhase()
+                self.overlay.setVisible(self.dictation.phase.isActive)
+                self.observePhase()
             }
         }
     }

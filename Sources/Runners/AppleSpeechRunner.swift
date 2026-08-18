@@ -3,6 +3,7 @@ import Foundation
 import OSLog
 import Speech
 
+#if compiler(>=6.2)
 /// Apple's on-device SpeechAnalyzer, new in macOS 26.
 ///
 /// The zero-download default: the system owns the models, so a fresh install
@@ -162,3 +163,37 @@ actor AppleSpeechRunner: TranscriptionRunner {
         return url
     }
 }
+#else
+/// Keeps the public project buildable with Xcode 16, whose SDK predates the
+/// macOS 26 SpeechAnalyzer APIs. The real implementation above is compiled by
+/// Xcode 26 and remains protected by its runtime availability check.
+actor AppleSpeechRunner: TranscriptionRunner {
+    nonisolated static let identifier = "apple-speech"
+
+    nonisolated let capabilities = RunnerCapabilities(
+        isLocal: true,
+        supportsWordTimestamps: false,
+        supportsTranslateToEnglish: false,
+        supportsVocabularyPrompt: false,
+        supportsLanguageDetection: false,
+        languageSupport: .all,
+        maximumDuration: nil
+    )
+
+    init(localeIdentifier: String) {}
+
+    func prepare(onProgress: @Sendable @escaping (Double) -> Void) async throws {
+        throw RunnerError.engineUnavailable("Apple Speech (needs Xcode 26 and macOS 26)")
+    }
+
+    func transcribe(
+        _ audio: AudioBuffer,
+        options: TranscriptionOptions,
+        onProgress: @Sendable @escaping (RunnerProgress) -> Void
+    ) async throws -> TranscriptionResult {
+        throw RunnerError.engineUnavailable("Apple Speech (needs Xcode 26 and macOS 26)")
+    }
+
+    func teardown() async {}
+}
+#endif
