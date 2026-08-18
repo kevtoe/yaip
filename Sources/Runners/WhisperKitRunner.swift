@@ -1,7 +1,7 @@
 import Foundation
 import NaturalLanguage
 import OSLog
-import WhisperKit
+@preconcurrency import WhisperKit
 
 /// Whisper via WhisperKit (Argmax OSS SDK, MIT), running CoreML on the Neural
 /// Engine.
